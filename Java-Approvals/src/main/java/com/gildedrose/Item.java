@@ -4,9 +4,6 @@ public class Item {
 
     private static final int MAX_QUALITY = 50;
     private static final int MIN_QUALITY = 0;
-    private static final String SULFURAS_HAND_OF_RAGNAROS = "Sulfuras, Hand of Ragnaros";
-    private static final String AGED_BRIE = "Aged Brie";
-    private static final String BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT = "Backstage passes to a TAFKAL80ETC concert";
 
     private final UpdateStrategy updateStrategy;
 
@@ -19,14 +16,14 @@ public class Item {
         this.name = name;
         this.remainingDays = sellIn;
         this.quality = quality;
-        this.updateStrategy = getUpdateStrategy(name);
+        this.updateStrategy = getUpdateStrategy(ItemType.fromName(name));
     }
 
-    private UpdateStrategy getUpdateStrategy(String name) {
-        return switch (name) {
+    private UpdateStrategy getUpdateStrategy(ItemType itemType) {
+        return switch (itemType) {
             case AGED_BRIE -> BrieUpdateStrategy.INSTANCE;
-            case BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT -> BackstagePassesUpdateStrategy.INSTANCE;
-            case SULFURAS_HAND_OF_RAGNAROS -> SulfurasUpdateStrategy.INSTANCE;
+            case BACKSTAGE_PASSES -> BackstagePassesUpdateStrategy.INSTANCE;
+            case SULFURAS -> SulfurasUpdateStrategy.INSTANCE;
             default -> DefaultUpdateStrategy.INSTANCE;
         };
     }
