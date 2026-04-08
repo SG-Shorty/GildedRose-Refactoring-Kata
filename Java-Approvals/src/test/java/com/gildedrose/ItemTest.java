@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 
-class ItemParameterizedTest {
+class ItemTest {
 
     private static final String NormalItem = "Normal Item";
     private static final String AgedBrie = "Aged Brie";
