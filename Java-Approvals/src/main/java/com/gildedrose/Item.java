@@ -8,7 +8,14 @@ public class Item {
     private static final String AGED_BRIE = "Aged Brie";
     private static final String BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT = "Backstage passes to a TAFKAL80ETC concert";
 
+    private final UpdateStrategy updateStrategy;
+
     private final String name;
+
+    public int getSellIn() {
+        return sellIn;
+    }
+
     private int sellIn;
     private int quality;
 
@@ -16,6 +23,16 @@ public class Item {
         this.name = name;
         this.sellIn = sellIn;
         this.quality = quality;
+        updateStrategy = getUpdateStrategy(name);
+    }
+
+    private UpdateStrategy getUpdateStrategy(String name) {
+        return switch (name) {
+            case AGED_BRIE -> BrieUpdateStrategy.INSTANCE;
+            case BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT -> BackstagePassesUpdateStrategy.INSTANCE;
+            case SULFURAS_HAND_OF_RAGNAROS -> SulfurasUpdateStrategy.INSTANCE;
+            default -> DefaultUpdateStrategy.INSTANCE;
+        };
     }
 
     @Override
@@ -23,52 +40,8 @@ public class Item {
         return this.name + ", " + this.sellIn + ", " + this.quality;
     }
 
-
     void update() {
-        switch (name) {
-            case AGED_BRIE -> updateAgedBrie();
-            case BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT -> updateBackstagePasses();
-            case SULFURAS_HAND_OF_RAGNAROS -> updateSulfuras();
-            default -> updateDefault();
-        }
-    }
-
-    private void updateAgedBrie() {
-        increaseQuality();
-        decreaseSellIn();
-
-        if (isExpired()) {
-            increaseQuality();
-        }
-    }
-
-    private void updateBackstagePasses() {
-        increaseQuality();
-
-        if (sellIn < 11) {
-            increaseQuality();
-        }
-
-        if (sellIn < 6) {
-            increaseQuality();
-        }
-
-        decreaseSellIn();
-
-        if (isExpired()) {
-            invalidate();
-        }
-    }
-
-    private void updateSulfuras() {/*do nothing*/}
-
-    private void updateDefault() {
-        decreaseQuality();
-        decreaseSellIn();
-
-        if (isExpired()) {
-            decreaseQuality();
-        }
+        updateStrategy.update(this);
     }
 
     void decreaseSellIn() {
