@@ -44,6 +44,52 @@ class ItemTest {
     }
 
     /* -------------------------------------------------
+   constructor – quality bounds
+   ------------------------------------------------- */
+
+    @ParameterizedTest
+    @CsvSource({
+        "Normal Item, 5, -10, 0",
+        "Normal Item, 5, -1, 0",
+        "Normal Item, 5, 51, 50",
+        "Normal Item, 5, 999, 50",
+        "Aged Brie, 5, 60, 50"
+    })
+    void constructorClampsQualityToValidRange(
+        String name,
+        int sellIn,
+        int inputQuality,
+        int expectedQuality) {
+
+        Item item = new Item(name, sellIn, inputQuality);
+
+        assertThat(item.getQuality()).isEqualTo(expectedQuality);
+    }
+
+    /* -------------------------------------------------
+   constructor – Sulfuras quality
+   ------------------------------------------------- */
+
+    @ParameterizedTest
+    @CsvSource({
+        "-10",
+        "0",
+        "10",
+        "50",
+        "79",
+        "80",
+        "81",
+        "999"
+    })
+    void sulfurasHasQualityEightyRegardlessOfConstructorInput(int inputQuality) {
+
+        Item item = new Item(ItemType.SULFURAS.itemName(), 10, inputQuality);
+
+        assertThat(item.getQuality()).isEqualTo(80);
+    }
+
+
+    /* -------------------------------------------------
        isExpired
        ------------------------------------------------- */
 

@@ -10,15 +10,21 @@ public class Item {
     private final UpdateStrategy updateStrategy;
 
     private final String name;
+    private final ItemType itemType;
     private int remainingDays;
 
     private int quality;
 
     public Item(String name, int sellIn, int quality) {
         this.name = Objects.requireNonNull(name, "Item name must not be null");
+        this.itemType = ItemType.fromName(this.name);
         this.remainingDays = sellIn;
-        this.quality = quality;
-        this.updateStrategy = ItemType.fromName(name).getUpdateStrategy();
+        if (this.itemType == ItemType.SULFURAS) {
+            this.quality = 80;
+        } else {
+            this.quality = Math.clamp(quality, MIN_QUALITY, MAX_QUALITY);
+        }
+        this.updateStrategy = itemType.getUpdateStrategy();
     }
 
     public int remainingDays() {
