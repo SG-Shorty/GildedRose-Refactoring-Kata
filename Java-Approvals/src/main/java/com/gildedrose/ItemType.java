@@ -2,11 +2,16 @@ package com.gildedrose;
 
 enum ItemType {
 
+    DEFAULT(DefaultUpdateStrategy.INSTANCE),
+    AGED_BRIE(BrieUpdateStrategy.INSTANCE),
+    BACKSTAGE_PASSES(BackstagePassesUpdateStrategy.INSTANCE),
+    SULFURAS(SulfurasUpdateStrategy.INSTANCE);
 
-    DEFAULT,
-    AGED_BRIE,
-    BACKSTAGE_PASSES,
-    SULFURAS;
+    private final UpdateStrategy strategy;
+
+    ItemType(UpdateStrategy strategy) {
+        this.strategy = strategy;
+    }
 
     public static final String AGED_BRIE_NAME = "Aged Brie";
     public static final String BACKSTAGE_PASSES_NAME = "Backstage passes to a TAFKAL80ETC concert";
@@ -19,6 +24,10 @@ enum ItemType {
             case SULFURAS_NAME -> SULFURAS;
             default -> DEFAULT;
         };
+    }
+
+    UpdateStrategy getUpdateStrategy() {
+        return strategy;
     }
 
 }

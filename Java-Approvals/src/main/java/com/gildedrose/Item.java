@@ -16,16 +16,7 @@ public class Item {
         this.name = name;
         this.remainingDays = sellIn;
         this.quality = quality;
-        this.updateStrategy = getUpdateStrategy(ItemType.fromName(name));
-    }
-
-    private UpdateStrategy getUpdateStrategy(ItemType itemType) {
-        return switch (itemType) {
-            case AGED_BRIE -> BrieUpdateStrategy.INSTANCE;
-            case BACKSTAGE_PASSES -> BackstagePassesUpdateStrategy.INSTANCE;
-            case SULFURAS -> SulfurasUpdateStrategy.INSTANCE;
-            default -> DefaultUpdateStrategy.INSTANCE;
-        };
+        this.updateStrategy = ItemType.fromName(name).getUpdateStrategy();
     }
 
     public int remainingDays() {

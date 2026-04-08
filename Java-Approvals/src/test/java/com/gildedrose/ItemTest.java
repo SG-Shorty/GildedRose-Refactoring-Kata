@@ -8,16 +8,12 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;
 
+import static com.gildedrose.ItemType.*;
 import static org.assertj.core.api.Assertions.*;
 
 class ItemTest {
 
-    private static final String NormalItem = "Normal Item";
-    private static final String AgedBrie = "Aged Brie";
-    private static final String BackstagePasses =
-        "Backstage passes to a TAFKAL80ETC concert";
-    private static final String Sulfuras =
-        "Sulfuras, Hand of Ragnaros";
+    private static final String NORMAL_ITEM_NAME = "Normal Item";
 
     /* -------------------------------------------------
        Constructor
@@ -62,7 +58,7 @@ class ItemTest {
     void isExpiredDependsOnlyOnRemainingDays(
         int remainingDays, boolean expectedExpired) {
 
-        Item item = new Item(NormalItem, remainingDays, 10);
+        Item item = new Item(NORMAL_ITEM_NAME, remainingDays, 10);
 
         assertThat(item.isExpired()).isEqualTo(expectedExpired);
     }
@@ -80,7 +76,7 @@ class ItemTest {
     void decreaseRemainingDaysAlwaysDecrementsByOne(
         int start, int expected) {
 
-        Item item = new Item(NormalItem, start, 10);
+        Item item = new Item(NORMAL_ITEM_NAME, start, 10);
 
         item.decreaseRemainingDays();
 
@@ -101,7 +97,7 @@ class ItemTest {
     void increaseQualityRespectsUpperBound(
         int startQuality, int expectedQuality) {
 
-        Item item = new Item(AgedBrie, 5, startQuality);
+        Item item = new Item(AGED_BRIE_NAME, 5, startQuality);
 
         item.increaseQuality();
 
@@ -121,7 +117,7 @@ class ItemTest {
     void decreaseQualityRespectsLowerBound(
         int startQuality, int expectedQuality) {
 
-        Item item = new Item(NormalItem, 5, startQuality);
+        Item item = new Item(NORMAL_ITEM_NAME, 5, startQuality);
 
         item.decreaseQuality();
 
@@ -136,7 +132,7 @@ class ItemTest {
     @CsvSource({ "0", "1", "42", "50" })
     void invalidateSetsQualityToZeroForAnyInput(int startQuality) {
 
-        Item item = new Item(NormalItem, 5, startQuality);
+        Item item = new Item(NORMAL_ITEM_NAME, 5, startQuality);
 
         item.invalidate();
 
@@ -159,7 +155,7 @@ class ItemTest {
         int expectedSellIn,
         int expectedQuality) {
 
-        Item item = new Item(NormalItem, sellIn, quality);
+        Item item = new Item(NORMAL_ITEM_NAME, sellIn, quality);
 
         item.update();
 
@@ -183,7 +179,7 @@ class ItemTest {
         int expectedSellIn,
         int expectedQuality) {
 
-        Item item = new Item(AgedBrie, sellIn, quality);
+        Item item = new Item(AGED_BRIE_NAME, sellIn, quality);
 
         item.update();
 
@@ -220,7 +216,7 @@ class ItemTest {
         int expectedSellIn,
         int expectedQuality) {
 
-        Item item = new Item(BackstagePasses, sellIn, quality);
+        Item item = new Item(BACKSTAGE_PASSES_NAME, sellIn, quality);
 
         item.update();
 
@@ -234,7 +230,7 @@ class ItemTest {
 
     @Test
     void updateSulfurasNeverChangesState() {
-        Item item = new Item(Sulfuras, 0, 80);
+        Item item = new Item(SULFURAS_NAME, 0, 80);
 
         item.update();
 
