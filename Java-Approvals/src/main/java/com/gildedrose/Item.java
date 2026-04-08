@@ -53,11 +53,23 @@ public class Item {
     }
 
     void increaseQuality() {
-        quality = Math.min(quality + 1, MAX_QUALITY);
+        increaseQualityBy(1);
     }
 
     void decreaseQuality() {
-        quality = Math.max(quality - 1, MIN_QUALITY);
+        decreaseQualityBy(1);
+    }
+
+    void increaseQualityBy(int amount) {
+        changeQualityBy(amount);
+    }
+
+    void decreaseQualityBy(int amount) {
+        changeQualityBy(-amount);
+    }
+
+    private void changeQualityBy(int amount) {
+        quality = Math.clamp(quality + amount, MIN_QUALITY, MAX_QUALITY);
     }
 
     void invalidate() {

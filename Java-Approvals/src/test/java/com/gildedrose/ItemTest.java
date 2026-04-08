@@ -238,4 +238,23 @@ class ItemTest {
         assertThat(item.remainingDays()).isEqualTo(0);
         assertThat(item.getQuality()).isEqualTo(80);
     }
+
+
+    @Test
+    void increaseQualityByDoesNotGoBelowZero() {
+        Item item = new Item("Normal Item", 5, 0);
+
+        item.increaseQualityBy(-10);
+
+        assertThat(item.getQuality()).isZero();
+    }
+
+    @Test
+    void increaseQualityByDoesNotExceedMaximum() {
+        Item item = new Item("Aged Brie", 5, 49);
+
+        item.increaseQualityBy(10);
+
+        assertThat(item.getQuality()).isEqualTo(50);
+    }
 }
