@@ -57,15 +57,11 @@ public class Item {
     }
 
     void decreaseQuality() {
-        decreaseQualityBy(1);
+        changeQualityBy(-1);
     }
 
     void increaseQualityBy(int amount) {
         changeQualityBy(amount);
-    }
-
-    void decreaseQualityBy(int amount) {
-        changeQualityBy(-amount);
     }
 
     private void changeQualityBy(int amount) {
