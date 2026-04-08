@@ -11,17 +11,12 @@ public class Item {
     private final UpdateStrategy updateStrategy;
 
     private final String name;
-
-    public int getSellIn() {
-        return sellIn;
-    }
-
-    private int sellIn;
+    private int remainingDays;
     private int quality;
 
     public Item(String name, int sellIn, int quality) {
         this.name = name;
-        this.sellIn = sellIn;
+        this.remainingDays = sellIn;
         this.quality = quality;
         updateStrategy = getUpdateStrategy(name);
     }
@@ -35,17 +30,21 @@ public class Item {
         };
     }
 
+    public int remainingDays() {
+        return remainingDays;
+    }
+
     @Override
     public String toString() {
-        return this.name + ", " + this.sellIn + ", " + this.quality;
+        return this.name + ", " + this.remainingDays + ", " + this.quality;
     }
 
     void update() {
         updateStrategy.update(this);
     }
 
-    void decreaseSellIn() {
-        sellIn = sellIn - 1;
+    void decreaseRemainingDays() {
+        remainingDays = remainingDays - 1;
     }
 
     void increaseQuality() {
@@ -61,6 +60,6 @@ public class Item {
     }
 
     boolean isExpired() {
-        return sellIn < 0;
+        return remainingDays < 0;
     }
 }

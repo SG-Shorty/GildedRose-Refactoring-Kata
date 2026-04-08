@@ -8,7 +8,7 @@ public class DefaultUpdateStrategy implements UpdateStrategy {
     @Override
     public void update(Item item) {
         item.decreaseQuality();
-        item.decreaseSellIn();
+        item.decreaseRemainingDays();
 
         if (item.isExpired()) {
             item.decreaseQuality();

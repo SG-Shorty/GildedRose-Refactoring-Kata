@@ -9,15 +9,15 @@ public class BackstagePassesUpdateStrategy implements UpdateStrategy {
     public void update(Item item) {
         item.increaseQuality();
 
-        if (item.getSellIn() < 11) {
+        if (item.remainingDays() < 11) {
             item.increaseQuality();
         }
 
-        if (item.getSellIn() < 6) {
+        if (item.remainingDays() < 6) {
             item.increaseQuality();
         }
 
-        item.decreaseSellIn();
+        item.decreaseRemainingDays();
 
         if (item.isExpired()) {
             item.invalidate();

@@ -9,7 +9,7 @@ public class BrieUpdateStrategy implements UpdateStrategy {
     @Override
     public void update(Item item) {
         item.increaseQuality();
-        item.decreaseSellIn();
+        item.decreaseRemainingDays();
 
         if (item.isExpired()) {
             item.increaseQuality();
