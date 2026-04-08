@@ -19,14 +19,12 @@ public class Item {
     }
 
     @Override
-   public String toString() {
+    public String toString() {
         return this.name + ", " + this.sellIn + ", " + this.quality;
     }
 
 
-
-
-     void update() {
+    void update() {
         switch (name) {
             case AGED_BRIE -> updateAgedBrie();
             case BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT -> updateBackstagePasses();
@@ -35,7 +33,7 @@ public class Item {
         }
     }
 
-     private void updateAgedBrie() {
+    private void updateAgedBrie() {
         increaseQuality();
         decreaseSellIn();
 
@@ -44,7 +42,7 @@ public class Item {
         }
     }
 
-     private void updateBackstagePasses() {
+    private void updateBackstagePasses() {
         increaseQuality();
 
         if (sellIn < 11) {
@@ -64,7 +62,7 @@ public class Item {
 
     private void updateSulfuras() {/*do nothing*/}
 
-     private void updateDefault() {
+    private void updateDefault() {
         decreaseQuality();
         decreaseSellIn();
 
@@ -73,23 +71,23 @@ public class Item {
         }
     }
 
-     private void decreaseSellIn() {
+    private void decreaseSellIn() {
         sellIn = sellIn - 1;
     }
 
-     private void increaseQuality() {
+    void increaseQuality() {
         quality = Math.min(quality + 1, MAX_QUALITY);
     }
 
-     private void decreaseQuality() {
+    void decreaseQuality() {
         quality = Math.max(quality - 1, MIN_QUALITY);
     }
 
-     private void invalidate() {
+    void invalidate() {
         quality = 0;
     }
 
-     private boolean isExpired() {
+    boolean isExpired() {
         return sellIn < 0;
     }
 }
