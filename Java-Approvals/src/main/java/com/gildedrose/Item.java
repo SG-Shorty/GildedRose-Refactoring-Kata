@@ -12,6 +12,7 @@ public class Item {
 
     private final String name;
     private int remainingDays;
+
     private int quality;
 
     public Item(String name, int sellIn, int quality) {
@@ -32,6 +33,10 @@ public class Item {
 
     public int remainingDays() {
         return remainingDays;
+    }
+
+    public int getQuality() {
+        return quality;
     }
 
     @Override

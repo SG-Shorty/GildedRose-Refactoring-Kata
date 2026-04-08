@@ -10,13 +10,13 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 
-class ItemTest {
+class ItemParameterizedTest {
 
-    private static final String NORMAL = "Normal Item";
-    private static final String AGED_BRIE = "Aged Brie";
-    private static final String BACKSTAGE =
+    private static final String NormalItem = "Normal Item";
+    private static final String AgedBrie = "Aged Brie";
+    private static final String BackstagePasses =
         "Backstage passes to a TAFKAL80ETC concert";
-    private static final String SULFURAS =
+    private static final String Sulfuras =
         "Sulfuras, Hand of Ragnaros";
 
     /* -------------------------------------------------
@@ -30,18 +30,17 @@ class ItemTest {
         "Normal Item, -5, 7",
         "Aged Brie, 3, 49"
     })
-    void constructor_sets_fields_exactly_as_given(
+    void constructorSetsFieldsExactlyAsGiven(
         String name, int sellIn, int quality) {
 
         Item item = new Item(name, sellIn, quality);
 
         assertThat(item.remainingDays()).isEqualTo(sellIn);
-        assertThat(item.toString())
-            .isEqualTo(name + ", " + sellIn + ", " + quality);
+        assertThat(item.getQuality()).isEqualTo(quality);
     }
 
     @Test
-    void constructor_throws_null_pointer_exception_for_null_name() {
+    void constructorThrowsNullPointerExceptionForNullName() {
         assertThatThrownBy(() -> new Item(null, 5, 10))
             .isInstanceOf(NullPointerException.class);
     }
@@ -57,10 +56,10 @@ class ItemTest {
         "-1, true",
         "-100, true"
     })
-    void isExpired_depends_only_on_remaining_days(
+    void isExpiredDependsOnlyOnRemainingDays(
         int remainingDays, boolean expectedExpired) {
 
-        Item item = new Item(NORMAL, remainingDays, 10);
+        Item item = new Item(NormalItem, remainingDays, 10);
 
         assertThat(item.isExpired()).isEqualTo(expectedExpired);
     }
@@ -75,10 +74,10 @@ class ItemTest {
         "0, -1",
         "-5, -6"
     })
-    void decreaseRemainingDays_always_decrements_by_one(
+    void decreaseRemainingDaysAlwaysDecrementsByOne(
         int start, int expected) {
 
-        Item item = new Item(NORMAL, start, 10);
+        Item item = new Item(NormalItem, start, 10);
 
         item.decreaseRemainingDays();
 
@@ -96,15 +95,14 @@ class ItemTest {
         "49, 50",
         "50, 50"
     })
-    void increaseQuality_respects_upper_bound(
+    void increaseQualityRespectsUpperBound(
         int startQuality, int expectedQuality) {
 
-        Item item = new Item(AGED_BRIE, 5, startQuality);
+        Item item = new Item(AgedBrie, 5, startQuality);
 
         item.increaseQuality();
 
-        assertThat(item.toString())
-            .endsWith(", " + expectedQuality);
+        assertThat(item.getQuality()).isEqualTo(expectedQuality);
     }
 
     /* -------------------------------------------------
@@ -117,15 +115,14 @@ class ItemTest {
         "1, 0",
         "0, 0"
     })
-    void decreaseQuality_respects_lower_bound(
+    void decreaseQualityRespectsLowerBound(
         int startQuality, int expectedQuality) {
 
-        Item item = new Item(NORMAL, 5, startQuality);
+        Item item = new Item(NormalItem, 5, startQuality);
 
         item.decreaseQuality();
 
-        assertThat(item.toString())
-            .endsWith(", " + expectedQuality);
+        assertThat(item.getQuality()).isEqualTo(expectedQuality);
     }
 
     /* -------------------------------------------------
@@ -134,14 +131,13 @@ class ItemTest {
 
     @ParameterizedTest
     @CsvSource({ "0", "1", "42", "50" })
-    void invalidate_sets_quality_to_zero_for_any_input(int startQuality) {
+    void invalidateSetsQualityToZeroForAnyInput(int startQuality) {
 
-        Item item = new Item(NORMAL, 5, startQuality);
+        Item item = new Item(NormalItem, 5, startQuality);
 
         item.invalidate();
 
-        assertThat(item.toString())
-            .endsWith(", 0");
+        assertThat(item.getQuality()).isZero();
     }
 
     /* -------------------------------------------------
@@ -154,19 +150,18 @@ class ItemTest {
         "0, 20, -1, 18",
         "-1, 1, -2, 0"
     })
-    void update_normal_items_follow_standard_rules(
+    void updateNormalItemsFollowStandardRules(
         int sellIn,
         int quality,
         int expectedSellIn,
         int expectedQuality) {
 
-        Item item = new Item(NORMAL, sellIn, quality);
+        Item item = new Item(NormalItem, sellIn, quality);
 
         item.update();
 
-        assertThat(item.toString())
-            .isEqualTo(NORMAL + ", " +
-                expectedSellIn + ", " + expectedQuality);
+        assertThat(item.remainingDays()).isEqualTo(expectedSellIn);
+        assertThat(item.getQuality()).isEqualTo(expectedQuality);
     }
 
     /* -------------------------------------------------
@@ -179,19 +174,18 @@ class ItemTest {
         "0, 20, -1, 22",
         "-1, 49, -2, 50"
     })
-    void update_aged_brie_increases_quality(
+    void updateAgedBrieIncreasesQuality(
         int sellIn,
         int quality,
         int expectedSellIn,
         int expectedQuality) {
 
-        Item item = new Item(AGED_BRIE, sellIn, quality);
+        Item item = new Item(AgedBrie, sellIn, quality);
 
         item.update();
 
-        assertThat(item.toString())
-            .isEqualTo(AGED_BRIE + ", " +
-                expectedSellIn + ", " + expectedQuality);
+        assertThat(item.remainingDays()).isEqualTo(expectedSellIn);
+        assertThat(item.getQuality()).isEqualTo(expectedQuality);
     }
 
     /* -------------------------------------------------
@@ -200,30 +194,35 @@ class ItemTest {
 
     static Stream<Arguments> backstagePassUpdateCases() {
         return Stream.of(
+            // normal increases
             Arguments.of(15, 20, 14, 21),
             Arguments.of(10, 20, 9, 22),
             Arguments.of(5, 20, 4, 23),
+
+            // upper-bound protection
+            Arguments.of(10, 49, 9, 50),
+            Arguments.of(6, 49, 5, 50),
+            Arguments.of(5, 48, 4, 50),
+
+            // after concert
             Arguments.of(0, 20, -1, 0)
         );
     }
 
     @ParameterizedTest
     @MethodSource("backstagePassUpdateCases")
-    void update_backstage_passes_follow_concert_rules(
+    void updateBackstagePassesFollowConcertRulesAndRespectUpperBound(
         int sellIn,
         int quality,
         int expectedSellIn,
         int expectedQuality) {
 
-        Item item = new Item(BACKSTAGE, sellIn, quality);
+        Item item = new Item(BackstagePasses, sellIn, quality);
 
         item.update();
 
-        assertThat(item.toString())
-            .isEqualTo(
-                BACKSTAGE + ", " +
-                    expectedSellIn + ", " + expectedQuality
-            );
+        assertThat(item.remainingDays()).isEqualTo(expectedSellIn);
+        assertThat(item.getQuality()).isEqualTo(expectedQuality);
     }
 
     /* -------------------------------------------------
@@ -231,12 +230,12 @@ class ItemTest {
        ------------------------------------------------- */
 
     @Test
-    void update_sulfuras_never_changes_state() {
-        Item item = new Item(SULFURAS, 0, 80);
+    void updateSulfurasNeverChangesState() {
+        Item item = new Item(Sulfuras, 0, 80);
 
         item.update();
 
-        assertThat(item.toString())
-            .isEqualTo(SULFURAS + ", 0, 80");
+        assertThat(item.remainingDays()).isEqualTo(0);
+        assertThat(item.getQuality()).isEqualTo(80);
     }
 }
