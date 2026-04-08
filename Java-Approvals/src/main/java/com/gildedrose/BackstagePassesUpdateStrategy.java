@@ -7,20 +7,21 @@ public class BackstagePassesUpdateStrategy implements UpdateStrategy {
 
     @Override
     public void update(Item item) {
-        item.increaseQuality();
-
-        if (item.remainingDays() < 11) {
-            item.increaseQuality();
-        }
-
-        if (item.remainingDays() < 6) {
-            item.increaseQuality();
-        }
-
+        increaseQuality(item);
         item.decreaseRemainingDays();
 
         if (item.isExpired()) {
             item.invalidate();
+        }
+    }
+
+    private void increaseQuality(Item item) {
+        if (item.remainingDays() < 6) {
+            item.increaseQualityBy(3);
+        } else if (item.remainingDays() < 11) {
+            item.increaseQualityBy(2);
+        } else {
+            item.increaseQuality();
         }
     }
 }
