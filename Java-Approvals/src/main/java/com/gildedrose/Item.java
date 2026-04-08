@@ -18,7 +18,7 @@ public class Item {
         this.name = name;
         this.remainingDays = sellIn;
         this.quality = quality;
-        updateStrategy = getUpdateStrategy(name);
+        this.updateStrategy = getUpdateStrategy(name);
     }
 
     private UpdateStrategy getUpdateStrategy(String name) {
