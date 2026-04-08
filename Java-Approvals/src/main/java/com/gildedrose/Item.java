@@ -71,23 +71,23 @@ public class Item {
         }
     }
 
-    private void decreaseSellIn() {
+    void decreaseSellIn() {
         sellIn = sellIn - 1;
     }
 
-    private void increaseQuality() {
+    void increaseQuality() {
         quality = Math.min(quality + 1, MAX_QUALITY);
     }
 
-    private void decreaseQuality() {
+    void decreaseQuality() {
         quality = Math.max(quality - 1, MIN_QUALITY);
     }
 
-    private void invalidate() {
+    void invalidate() {
         quality = 0;
     }
 
-    private boolean isExpired() {
+    boolean isExpired() {
         return sellIn < 0;
     }
 }
