@@ -69,7 +69,7 @@ public class Item {
     }
 
     void invalidate() {
-        quality = 0;
+        quality = MIN_QUALITY;
     }
 
     boolean isExpired() {
