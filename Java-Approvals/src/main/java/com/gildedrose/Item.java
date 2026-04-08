@@ -2,15 +2,15 @@ package com.gildedrose;
 
 public class Item {
 
-    public static final int MAX_QUALITY = 50;
-    public static final int MIN_QUALITY = 0;
-    public static final String SULFURAS_HAND_OF_RAGNAROS = "Sulfuras, Hand of Ragnaros";
-    public static final String AGED_BRIE = "Aged Brie";
-    public static final String BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT = "Backstage passes to a TAFKAL80ETC concert";
+    private static final int MAX_QUALITY = 50;
+    private static final int MIN_QUALITY = 0;
+    private static final String SULFURAS_HAND_OF_RAGNAROS = "Sulfuras, Hand of Ragnaros";
+    private static final String AGED_BRIE = "Aged Brie";
+    private static final String BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT = "Backstage passes to a TAFKAL80ETC concert";
 
-    public String name;
-    public int sellIn;
-    public int quality;
+    private final String name;
+    private int sellIn;
+    private int quality;
 
     public Item(String name, int sellIn, int quality) {
         this.name = name;
@@ -23,7 +23,10 @@ public class Item {
         return this.name + ", " + this.sellIn + ", " + this.quality;
     }
 
-    void update() {
+
+
+
+     void update() {
         switch (name) {
             case AGED_BRIE -> updateAgedBrie();
             case BACKSTAGE_PASSES_TO_A_TAFKAL_80_ETC_CONCERT -> updateBackstagePasses();
@@ -32,9 +35,8 @@ public class Item {
         }
     }
 
-    void updateAgedBrie() {
+     private void updateAgedBrie() {
         increaseQuality();
-
         decreaseSellIn();
 
         if (isExpired()) {
@@ -42,7 +44,7 @@ public class Item {
         }
     }
 
-    void updateBackstagePasses() {
+     private void updateBackstagePasses() {
         increaseQuality();
 
         if (sellIn < 11) {
@@ -56,13 +58,14 @@ public class Item {
         decreaseSellIn();
 
         if (isExpired()) {
-            invalidateItem();
+            invalidate();
         }
     }
 
-    void updateDefault() {
-        decreaseQuality();
+    private void updateSulfuras() {/*do nothing*/}
 
+     private void updateDefault() {
+        decreaseQuality();
         decreaseSellIn();
 
         if (isExpired()) {
@@ -70,27 +73,23 @@ public class Item {
         }
     }
 
-    public void updateSulfuras() {
-        //do nothing
-    }
-
-    void decreaseSellIn() {
+     private void decreaseSellIn() {
         sellIn = sellIn - 1;
     }
 
-    void increaseQuality() {
+     private void increaseQuality() {
         quality = Math.min(quality + 1, MAX_QUALITY);
     }
 
-    void decreaseQuality() {
+     private void decreaseQuality() {
         quality = Math.max(quality - 1, MIN_QUALITY);
     }
 
-    void invalidateItem() {
+     private void invalidate() {
         quality = 0;
     }
 
-    boolean isExpired() {
+     private boolean isExpired() {
         return sellIn < 0;
     }
 }
