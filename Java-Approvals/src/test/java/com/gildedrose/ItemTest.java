@@ -37,7 +37,10 @@ class ItemTest {
 
         assertThat(item.remainingDays()).isEqualTo(sellIn);
         assertThat(item.getQuality()).isEqualTo(quality);
+        assertThat(item.toString())
+            .isEqualTo(name + ", " + sellIn + ", " + quality);
     }
+
 
     @Test
     void constructorThrowsNullPointerExceptionForNullName() {
