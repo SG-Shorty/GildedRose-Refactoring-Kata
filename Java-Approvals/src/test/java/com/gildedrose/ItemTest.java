@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.stream.Stream;
 
-import static com.gildedrose.ItemType.*;
 import static org.assertj.core.api.Assertions.*;
 
 class ItemTest {
@@ -97,7 +96,7 @@ class ItemTest {
     void increaseQualityRespectsUpperBound(
         int startQuality, int expectedQuality) {
 
-        Item item = new Item(AGED_BRIE_NAME, 5, startQuality);
+        Item item = new Item(ItemType.AGED_BRIE.itemName(), 5, startQuality);
 
         item.increaseQuality();
 
@@ -179,7 +178,7 @@ class ItemTest {
         int expectedSellIn,
         int expectedQuality) {
 
-        Item item = new Item(AGED_BRIE_NAME, sellIn, quality);
+        Item item = new Item(ItemType.AGED_BRIE.itemName(), sellIn, quality);
 
         item.update();
 
@@ -216,7 +215,7 @@ class ItemTest {
         int expectedSellIn,
         int expectedQuality) {
 
-        Item item = new Item(BACKSTAGE_PASSES_NAME, sellIn, quality);
+        Item item = new Item(ItemType.BACKSTAGE_PASSES.itemName(), sellIn, quality);
 
         item.update();
 
@@ -230,7 +229,7 @@ class ItemTest {
 
     @Test
     void updateSulfurasNeverChangesState() {
-        Item item = new Item(SULFURAS_NAME, 0, 80);
+        Item item = new Item(ItemType.SULFURAS.itemName(), 0, 80);
 
         item.update();
 

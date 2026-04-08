@@ -1,5 +1,7 @@
 package com.gildedrose;
 
+import java.util.Objects;
+
 public class Item {
 
     private static final int MAX_QUALITY = 50;
@@ -13,7 +15,7 @@ public class Item {
     private int quality;
 
     public Item(String name, int sellIn, int quality) {
-        this.name = name;
+        this.name = Objects.requireNonNull(name, "Item name must not be null");
         this.remainingDays = sellIn;
         this.quality = quality;
         this.updateStrategy = ItemType.fromName(name).getUpdateStrategy();

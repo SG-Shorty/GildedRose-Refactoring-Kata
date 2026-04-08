@@ -2,32 +2,33 @@ package com.gildedrose;
 
 enum ItemType {
 
-    DEFAULT(DefaultUpdateStrategy.INSTANCE),
-    AGED_BRIE(BrieUpdateStrategy.INSTANCE),
-    BACKSTAGE_PASSES(BackstagePassesUpdateStrategy.INSTANCE),
-    SULFURAS(SulfurasUpdateStrategy.INSTANCE);
+    DEFAULT(null, DefaultUpdateStrategy.INSTANCE),
+    AGED_BRIE("Aged Brie", BrieUpdateStrategy.INSTANCE),
+    BACKSTAGE_PASSES("Backstage passes to a TAFKAL80ETC concert", BackstagePassesUpdateStrategy.INSTANCE),
+    SULFURAS("Sulfuras, Hand of Ragnaros", SulfurasUpdateStrategy.INSTANCE);
 
     private final UpdateStrategy strategy;
+    private final String itemName;
 
-    ItemType(UpdateStrategy strategy) {
+    ItemType(String itemName, UpdateStrategy strategy) {
         this.strategy = strategy;
+        this.itemName = itemName;
     }
 
-    public static final String AGED_BRIE_NAME = "Aged Brie";
-    public static final String BACKSTAGE_PASSES_NAME = "Backstage passes to a TAFKAL80ETC concert";
-    public static final String SULFURAS_NAME = "Sulfuras, Hand of Ragnaros";
-
     static ItemType fromName(String name) {
-        return switch (name) {
-            case AGED_BRIE_NAME -> AGED_BRIE;
-            case BACKSTAGE_PASSES_NAME -> BACKSTAGE_PASSES;
-            case SULFURAS_NAME -> SULFURAS;
-            default -> DEFAULT;
-        };
+        for (ItemType type : values()) {
+            if (type.itemName != null && type.itemName.equals(name)) {
+                return type;
+            }
+        }
+        return DEFAULT;
     }
 
     UpdateStrategy getUpdateStrategy() {
         return strategy;
     }
 
+    public String itemName() {
+        return itemName;
+    }
 }
