@@ -175,11 +175,11 @@ class ItemTest {
 
     @ParameterizedTest
     @CsvSource({ "0", "1", "42", "50" })
-    void invalidateSetsQualityToZeroForAnyInput(int startQuality) {
+    void setQualityToZeroSetsQualityToZeroForAnyInput(int startQuality) {
 
         Item item = new Item(NORMAL_ITEM_NAME, 5, startQuality);
 
-        item.invalidate();
+        item.setQualityToZero();
 
         assertThat(item.getQuality()).isZero();
     }

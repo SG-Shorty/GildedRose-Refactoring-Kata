@@ -6,6 +6,7 @@ public class Item {
 
     private static final int MAX_QUALITY = 50;
     private static final int MIN_QUALITY = 0;
+    private static final int SULFURAS_QUALITY = 80;
 
     private final UpdateStrategy updateStrategy;
 
@@ -14,19 +15,19 @@ public class Item {
     private int quality;
 
     public Item(String name, int sellIn, int quality) {
-        this.remainingDays = sellIn;
         this.name = Objects.requireNonNull(name, "Item name must not be null");
         ItemType itemType = ItemType.fromName(this.name);
-        this.quality = limitQuality(quality, itemType);
+        this.remainingDays = sellIn;
+        this.quality = initialQuality(quality, itemType);
         this.updateStrategy = itemType.getUpdateStrategy();
     }
 
-    private int limitQuality(int quality, ItemType itemType) {
+    private int initialQuality(int quality, ItemType itemType) {
         if (itemType == ItemType.SULFURAS) {
-            return  80;
-        } else {
-            return Math.clamp(quality, MIN_QUALITY, MAX_QUALITY);
+            return SULFURAS_QUALITY;
         }
+
+        return Math.clamp(quality, MIN_QUALITY, MAX_QUALITY);
     }
 
     public int remainingDays() {
@@ -39,7 +40,7 @@ public class Item {
 
     @Override
     public String toString() {
-        return this.name + ", " + this.remainingDays + ", " + this.quality;
+        return name + ", " + remainingDays + ", " + quality;
     }
 
     void update() {
@@ -47,7 +48,7 @@ public class Item {
     }
 
     void decreaseRemainingDays() {
-        remainingDays = remainingDays - 1;
+        remainingDays--;
     }
 
     void increaseQuality() {
@@ -55,18 +56,22 @@ public class Item {
     }
 
     void decreaseQuality() {
-        changeQualityBy(-1);
+        adjustQuality(-1);
     }
 
     void increaseQualityBy(int amount) {
-        changeQualityBy(amount);
+        adjustQuality(amount);
     }
 
-    private void changeQualityBy(int amount) {
+    private void adjustQuality(int amount) {
         quality = Math.clamp(quality + amount, MIN_QUALITY, MAX_QUALITY);
     }
 
-    void invalidate() {
+    /**
+     * Sets quality to zero for rules that explicitly require it.
+     * This is intentionally separated from normal bounded adjustments.
+     */
+    void setQualityToZero() {
         quality = MIN_QUALITY;
     }
 
