@@ -4,47 +4,43 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class ItemTypeTest {
 
-    public static final String AGED_BRIE_NAME = "Aged Brie";
-    public static final String BACKSTAGE_PASSES_NAME = "Backstage passes to a TAFKAL80ETC concert";
-    public static final String SULFURAS_NAME = "Sulfuras, Hand of Ragnaros";
+    private static final String AGED_BRIE_NAME = "Aged Brie";
+    private static final String BACKSTAGE_PASSES_NAME = "Backstage passes to a TAFKAL80ETC concert";
+    private static final String SULFURAS_NAME = "Sulfuras, Hand of Ragnaros";
+    private static final String CONJURED_PREFIX = "Conjured ";
 
-    @Test
-    void FromNameShouldReturnAgedBrieForExactMatch() {
-        assertThat(ItemType.fromName(AGED_BRIE_NAME)).isEqualTo(ItemType.AGED_BRIE);
+    @ParameterizedTest(name = "[{index}] {0} -> {1}")
+    @CsvSource({
+            "Aged Brie, AGED_BRIE",
+            "Aged Brie Extra, AGED_BRIE",
+            "Backstage passes to a TAFKAL80ETC concert, BACKSTAGE_PASSES",
+            "Backstage passes to a TAFKAL80ETC concert VIP, BACKSTAGE_PASSES",
+            "'Sulfuras, Hand of Ragnaros', SULFURAS",
+            "Conjured Mana Cake, CONJURED",
+            "'Conjured', CONJURED"
+    })
+    void FromNameShouldResolveKnownItemTypes(String itemName, ItemType expectedType) {
+        assertThat(ItemType.fromName(itemName)).isEqualTo(expectedType);
     }
 
-    @Test
-    void FromNameShouldReturnBackstagePassesForExactMatch() {
-        assertThat(ItemType.fromName(BACKSTAGE_PASSES_NAME))
-                .isEqualTo(ItemType.BACKSTAGE_PASSES);
-    }
-
-    @Test
-    void FromNameShouldReturnSulfurasForExactMatch() {
-        assertThat(ItemType.fromName(SULFURAS_NAME)).isEqualTo(ItemType.SULFURAS);
-    }
-
-    @Test
-    void FromNameShouldReturnConjuredWhenNameStartsWithConjuredPrefix() {
-        assertThat(ItemType.fromName("Conjured Mana Cake")).isEqualTo(ItemType.CONJURED);
-    }
-
-    @Test
-    void FromNameShouldReturnConjuredWhenNameIsExactlyConjuredPrefix() {
-        assertThat(ItemType.fromName("Conjured ")).isEqualTo(ItemType.CONJURED);
-    }
-
-    @Test
-    void FromNameShouldReturnRegularForUnknownItem() {
-        assertThat(ItemType.fromName("Elixir of the Mongoose")).isEqualTo(ItemType.REGULAR);
-    }
-
-    @Test
-    void FromNameShouldReturnRegularForNonMatchingConjuredLikeName() {
-        assertThat(ItemType.fromName("Conjuration Scroll")).isEqualTo(ItemType.REGULAR);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @ValueSource(strings = {
+            "Elixir of the Mongoose",
+            "Foo",
+            "Conjuration Scroll",
+            "conjured Mana Cake",
+            " Conjured Mana Cake",
+            "Random item"
+    })
+    void FromNameShouldReturnRegularForUnknownOrNonMatchingNames(String itemName) {
+        assertThat(ItemType.fromName(itemName)).isEqualTo(ItemType.REGULAR);
     }
 
     @Test
@@ -52,143 +48,123 @@ class ItemTypeTest {
         assertThrows(NullPointerException.class, () -> ItemType.fromName(null));
     }
 
-    @Test
-    void UpdateQualityForAgedBrieShouldIncreaseQualityAndSellInAndIncreaseAgainWhenExpired() {
-        Item item = new Item(AGED_BRIE_NAME, 0, 0);
+    @ParameterizedTest(name = "[{index}] sellIn={0}, quality={1}")
+    @CsvSource({
+            "1, 0, 0, 1",
+            "0, 0, -1, 2",
+            "5, 49, 4, 50",
+            "5, 50, 4, 50"
+    })
+    void UpdateQualityForAgedBrieShouldIncreaseQualityAndSellInAndRespectMaxQuality(
+            int initialSellIn,
+            int initialQuality,
+            int expectedSellIn,
+            int expectedQuality
+    ) {
+        Item item = new Item(AGED_BRIE_NAME, initialSellIn, initialQuality);
 
         ItemType.AGED_BRIE.updateQuality(item);
 
-        assertThat(item.sellIn).isEqualTo(-1);
-        assertThat(item.quality).isEqualTo(2);
+        assertThat(item.sellIn).isEqualTo(expectedSellIn);
+        assertThat(item.quality).isEqualTo(expectedQuality);
     }
 
-    @Test
-    void UpdateQualityForAgedBrieShouldNotExceedMaxQuality() {
-        Item item = new Item(AGED_BRIE_NAME, 5, 50);
-
-        ItemType.AGED_BRIE.updateQuality(item);
-
-        assertThat(item.sellIn).isEqualTo(4);
-        assertThat(item.quality).isEqualTo(50);
-    }
-
-    @Test
-    void UpdateQualityForBackstagePassesShouldIncreaseQualityByOneWhenSellInIsAboveTen() {
-        Item item = new Item(BACKSTAGE_PASSES_NAME, 11, 10);
+    @ParameterizedTest(name = "[{index}] sellIn={0}, quality={1}")
+    @CsvSource({
+            "11, 10, 10, 11",
+            "10, 10, 9, 12",
+            "5, 10, 4, 13",
+            "0, 20, -1, 0",
+            "5, 49, 4, 50",
+            "1, 49, 0, 50"
+    })
+    void UpdateQualityForBackstagePassesShouldHandleAllSellInThresholds(
+            int initialSellIn,
+            int initialQuality,
+            int expectedSellIn,
+            int expectedQuality
+    ) {
+        Item item = new Item(BACKSTAGE_PASSES_NAME, initialSellIn, initialQuality);
 
         ItemType.BACKSTAGE_PASSES.updateQuality(item);
 
-        assertThat(item.sellIn).isEqualTo(10);
-        assertThat(item.quality).isEqualTo(11);
+        assertThat(item.sellIn).isEqualTo(expectedSellIn);
+        assertThat(item.quality).isEqualTo(expectedQuality);
     }
 
-    @Test
-    void UpdateQualityForBackstagePassesShouldIncreaseQualityByTwoWhenSellInIsTenOrLess() {
-        Item item = new Item(BACKSTAGE_PASSES_NAME, 10, 10);
-
-        ItemType.BACKSTAGE_PASSES.updateQuality(item);
-
-        assertThat(item.sellIn).isEqualTo(9);
-        assertThat(item.quality).isEqualTo(12);
-    }
-
-    @Test
-    void UpdateQualityForBackstagePassesShouldIncreaseQualityByThreeWhenSellInIsFiveOrLess() {
-        Item item = new Item(BACKSTAGE_PASSES_NAME, 5, 10);
-
-        ItemType.BACKSTAGE_PASSES.updateQuality(item);
-
-        assertThat(item.sellIn).isEqualTo(4);
-        assertThat(item.quality).isEqualTo(13);
-    }
-
-    @Test
-    void UpdateQualityForBackstagePassesShouldSetQualityToMinAfterExpiration() {
-        Item item = new Item(BACKSTAGE_PASSES_NAME, 0, 20);
-
-        ItemType.BACKSTAGE_PASSES.updateQuality(item);
-
-        assertThat(item.sellIn).isEqualTo(-1);
-        assertThat(item.quality).isEqualTo(0);
-    }
-
-    @Test
-    void UpdateQualityForBackstagePassesShouldNotExceedMaxQualityBeforeExpiration() {
-        Item item = new Item(BACKSTAGE_PASSES_NAME, 5, 49);
-
-        ItemType.BACKSTAGE_PASSES.updateQuality(item);
-
-        assertThat(item.sellIn).isEqualTo(4);
-        assertThat(item.quality).isEqualTo(50);
-    }
-
-    @Test
-    void UpdateQualityForSulfurasShouldNotChangeItem() {
-        Item item = new Item(SULFURAS_NAME, 0, 80);
+    @ParameterizedTest(name = "[{index}] sellIn={0}, quality={1}")
+    @CsvSource({
+            "0, 80, 0, 80",
+            "-1, 80, -1, 80",
+            "10, 80, 10, 80"
+    })
+    void UpdateQualityForSulfurasShouldNeverChangeItem(
+            int initialSellIn,
+            int initialQuality,
+            int expectedSellIn,
+            int expectedQuality
+    ) {
+        Item item = new Item(SULFURAS_NAME, initialSellIn, initialQuality);
 
         ItemType.SULFURAS.updateQuality(item);
 
-        assertThat(item.sellIn).isEqualTo(0);
-        assertThat(item.quality).isEqualTo(80);
+        assertThat(item.sellIn).isEqualTo(expectedSellIn);
+        assertThat(item.quality).isEqualTo(expectedQuality);
     }
 
-    @Test
-    void UpdateQualityForConjuredShouldDecreaseQualityByTwoAndSellInByOne() {
-        Item item = new Item("Conjured Mana Cake", 3, 6);
+    @ParameterizedTest(name = "[{index}] sellIn={0}, quality={1}")
+    @CsvSource({
+            "3, 6, 2, 4",
+            "1, 1, 0, 0",
+            "0, 6, -1, 2",
+            "0, 1, -1, 0",
+            "-1, 3, -2, 0"
+    })
+    void UpdateQualityForConjuredShouldDecreaseQualityAndRespectExpirationAndMinQuality(
+            int initialSellIn,
+            int initialQuality,
+            int expectedSellIn,
+            int expectedQuality
+    ) {
+        Item item = new Item(CONJURED_PREFIX + "Mana Cake", initialSellIn, initialQuality);
 
         ItemType.CONJURED.updateQuality(item);
 
-        assertThat(item.sellIn).isEqualTo(2);
-        assertThat(item.quality).isEqualTo(4);
+        assertThat(item.sellIn).isEqualTo(expectedSellIn);
+        assertThat(item.quality).isEqualTo(expectedQuality);
     }
 
-    @Test
-    void UpdateQualityForConjuredShouldDecreaseQualityByFourWhenExpired() {
-        Item item = new Item("Conjured Mana Cake", 0, 6);
-
-        ItemType.CONJURED.updateQuality(item);
-
-        assertThat(item.sellIn).isEqualTo(-1);
-        assertThat(item.quality).isEqualTo(2);
-    }
-
-    @Test
-    void UpdateQualityForConjuredShouldNotGoBelowMinQuality() {
-        Item item = new Item("Conjured Mana Cake", 0, 1);
-
-        ItemType.CONJURED.updateQuality(item);
-
-        assertThat(item.sellIn).isEqualTo(-1);
-        assertThat(item.quality).isEqualTo(0);
-    }
-
-    @Test
-    void UpdateQualityForRegularShouldDecreaseQualityByOneAndSellInByOne() {
-        Item item = new Item("Elixir of the Mongoose", 5, 7);
+    @ParameterizedTest(name = "[{index}] sellIn={0}, quality={1}")
+    @CsvSource({
+            "5, 7, 4, 6",
+            "0, 7, -1, 5",
+            "0, 1, -1, 0",
+            "-1, 0, -2, 0",
+            "10, 50, 9, 49"
+    })
+    void UpdateQualityForRegularShouldDecreaseQualityAndRespectExpirationAndMinQuality(
+            int initialSellIn,
+            int initialQuality,
+            int expectedSellIn,
+            int expectedQuality
+    ) {
+        Item item = new Item("Elixir of the Mongoose", initialSellIn, initialQuality);
 
         ItemType.REGULAR.updateQuality(item);
 
-        assertThat(item.sellIn).isEqualTo(4);
-        assertThat(item.quality).isEqualTo(6);
+        assertThat(item.sellIn).isEqualTo(expectedSellIn);
+        assertThat(item.quality).isEqualTo(expectedQuality);
     }
 
     @Test
-    void UpdateQualityForRegularShouldDecreaseQualityByTwoWhenExpired() {
-        Item item = new Item("Elixir of the Mongoose", 0, 7);
-
-        ItemType.REGULAR.updateQuality(item);
-
-        assertThat(item.sellIn).isEqualTo(-1);
-        assertThat(item.quality).isEqualTo(5);
-    }
-
-    @Test
-    void UpdateQualityForRegularShouldNotGoBelowMinQuality() {
-        Item item = new Item("Elixir of the Mongoose", 0, 0);
-
-        ItemType.REGULAR.updateQuality(item);
-
-        assertThat(item.sellIn).isEqualTo(-1);
-        assertThat(item.quality).isEqualTo(0);
+    void SanityCheckEnumConstantsShouldBePresent() {
+        assertThat(ItemType.values())
+                .containsExactly(
+                        ItemType.AGED_BRIE,
+                        ItemType.BACKSTAGE_PASSES,
+                        ItemType.SULFURAS,
+                        ItemType.CONJURED,
+                        ItemType.REGULAR
+                );
     }
 }
