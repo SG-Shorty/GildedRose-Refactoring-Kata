@@ -6,28 +6,28 @@ public enum ItemType {
 
     AGED_BRIE("Aged Brie") {
         @Override
-        public void updateQuality(Item item) {
+        void updateQuality(Item item) {
             updateAgedBrie(item);
         }
     },
 
     BACKSTAGE_PASSES("Backstage passes to a TAFKAL80ETC concert") {
         @Override
-        public void updateQuality(Item item) {
+        void updateQuality(Item item) {
             updateBackstagePasses(item);
         }
     },
 
     SULFURAS("Sulfuras, Hand of Ragnaros") {
         @Override
-        public void updateQuality(Item item) {
+        void updateQuality(Item item) {
             updateSulfuras();
         }
     },
 
     DEFAULT(null) {
         @Override
-        public void updateQuality(Item item) {
+        void updateQuality(Item item) {
             updateDefault(item);
         }
     };
@@ -41,9 +41,8 @@ public enum ItemType {
         this.itemName = itemName;
     }
 
-    public static ItemType fromName(String name) {
+    static ItemType fromName(String name) {
         Objects.requireNonNull(name, "Item name cannot be null");
-
         for (ItemType type : ItemType.values()) {
             if (name.equals(type.itemName)) {
                 return type;
@@ -53,11 +52,7 @@ public enum ItemType {
         return DEFAULT;
     }
 
-    public abstract void updateQuality(Item item);
-
-    public String getName() {
-        return itemName;
-    }
+    abstract void updateQuality(Item item);
 
     private static void updateAgedBrie(Item item) {
         increaseQuality(item);
