@@ -7,33 +7,59 @@ public enum ItemType {
     AGED_BRIE("Aged Brie") {
         @Override
         void updateQuality(Item item) {
-            updateAgedBrie(item);
+            increaseQuality(item);
+            decreaseSellIn(item);
+
+            if (isExpired(item)) {
+                increaseQuality(item);
+            }
         }
     },
 
     BACKSTAGE_PASSES("Backstage passes to a TAFKAL80ETC concert") {
         @Override
         void updateQuality(Item item) {
-            updateBackstagePasses(item);
+            increaseQuality(item);
+
+            if (item.sellIn <= 10) {
+                increaseQuality(item);
+            }
+
+            if (item.sellIn <= 5) {
+                increaseQuality(item);
+            }
+
+            decreaseSellIn(item);
+
+            if (isExpired(item)) {
+                setQualityToMin(item);
+            }
         }
     },
 
     SULFURAS("Sulfuras, Hand of Ragnaros") {
         @Override
         void updateQuality(Item item) {
-            updateSulfuras();
+            // Sulfuras never changes.
         }
     },
 
-    DEFAULT(null) {
+    REGULAR(null) {
         @Override
         void updateQuality(Item item) {
-            updateDefault(item);
+            decreaseQuality(item);
+            decreaseSellIn(item);
+
+            if (isExpired(item)) {
+                decreaseQuality(item);
+            }
         }
     };
 
     private static final int MAX_QUALITY = 50;
     private static final int MIN_QUALITY = 0;
+    private static final int EXPIRED_SELL_IN = 0;
+
 
     private final String itemName;
 
@@ -49,54 +75,14 @@ public enum ItemType {
             }
         }
 
-        return DEFAULT;
+        return REGULAR;
     }
 
     abstract void updateQuality(Item item);
 
-    private static void updateAgedBrie(Item item) {
-        increaseQuality(item);
-        decreaseSellIn(item);
-
-        if (isExpired(item)) {
-            increaseQuality(item);
-        }
-    }
-
-    private static void updateBackstagePasses(Item item) {
-        increaseQuality(item);
-
-        if (item.sellIn < 11) {
-            increaseQuality(item);
-        }
-
-        if (item.sellIn < 6) {
-            increaseQuality(item);
-        }
-
-        decreaseSellIn(item);
-
-        if (isExpired(item)) {
-            setQualityToMin(item);
-        }
-    }
-
-    private static void updateSulfuras() {
-        //do nothing
-    }
-
-    private static void updateDefault(Item item) {
-        decreaseQuality(item);
-
-        decreaseSellIn(item);
-
-        if (isExpired(item)) {
-            decreaseQuality(item);
-        }
-    }
 
     private static boolean isExpired(Item item) {
-        return item.sellIn < MIN_QUALITY;
+        return item.sellIn < EXPIRED_SELL_IN;
     }
 
     private static void decreaseSellIn(Item item) {
