@@ -23,7 +23,8 @@ class ItemTest {
         "Normal Item, 10, 20",
         "Normal Item, 0, 0",
         "Normal Item, -5, 7",
-        "Aged Brie, 3, 49"
+        "Aged Brie, 3, 49",
+        "Conjured Mana Cake, 3, 6"
     })
     void constructorSetsFieldsExactlyAsGiven(
         String name, int sellIn, int quality) {
@@ -300,5 +301,37 @@ class ItemTest {
         item.increaseQualityBy(10);
 
         assertThat(item.getQuality()).isEqualTo(50);
+    }
+    /* -------------------------------------------------
+       update – Conjured
+       ------------------------------------------------- */
+
+    @ParameterizedTest
+    @CsvSource({
+        "10, 20, 9, 18",
+        "0, 20, -1, 16",
+        "-1, 3, -2, 0"
+    })
+    void updateConjuredItemsDegradeTwiceAsFast(
+        int sellIn,
+        int quality,
+        int expectedSellIn,
+        int expectedQuality) {
+
+        Item item = new Item("Conjured Mana Cake", sellIn, quality);
+
+        item.update();
+
+        assertThat(item.remainingDays()).isEqualTo(expectedSellIn);
+        assertThat(item.getQuality()).isEqualTo(expectedQuality);
+    }
+
+    @Test
+    void updateConjuredItemsAreDetectedByPrefix() {
+        Item item = new Item("Conjured Something Else", 5, 10);
+
+        item.update();
+
+        assertThat(item.getQuality()).isEqualTo(8);
     }
 }

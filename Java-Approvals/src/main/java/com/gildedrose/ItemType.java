@@ -5,6 +5,7 @@ enum ItemType {
     DEFAULT(null, DefaultUpdateStrategy.INSTANCE),
     AGED_BRIE("Aged Brie", BrieUpdateStrategy.INSTANCE),
     BACKSTAGE_PASSES("Backstage passes to a TAFKAL80ETC concert", BackstagePassesUpdateStrategy.INSTANCE),
+    CONJURED("Conjured ", ConjuredUpdateStrategy.INSTANCE),
     SULFURAS("Sulfuras, Hand of Ragnaros", SulfurasUpdateStrategy.INSTANCE);
 
     private final UpdateStrategy strategy;
@@ -17,7 +18,7 @@ enum ItemType {
 
     static ItemType fromName(String name) {
         for (ItemType type : values()) {
-            if (type.itemName != null && type.itemName.equals(name)) {
+            if (type.itemName != null && name.startsWith(type.itemName)) {
                 return type;
             }
         }
