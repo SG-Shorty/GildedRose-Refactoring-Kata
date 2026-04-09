@@ -9,13 +9,11 @@ public class ConjuredUpdateStrategy implements UpdateStrategy {
 
     @Override
     public void update(Item item) {
-        item.decreaseQuality();
-        item.decreaseQuality();
+        item.decreaseQualityBy(2);
         item.decreaseRemainingDays();
 
         if (item.isExpired()) {
-            item.decreaseQuality();
-            item.decreaseQuality();
+            item.decreaseQualityBy(2);
         }
     }
 }
