@@ -43,7 +43,7 @@ public enum ItemType {
             // Sulfuras never changes.
         }
     },
-    CONJURED("Conjured ") {
+    CONJURED("Conjured") {
         @Override
         void updateQuality(Item item) {
             decreaseQuality(item);
