@@ -43,6 +43,20 @@ public enum ItemType {
             // Sulfuras never changes.
         }
     },
+    CONJURED("Conjured ") {
+        @Override
+        void updateQuality(Item item) {
+            decreaseQuality(item);
+            decreaseQuality(item);
+
+            decreaseSellIn(item);
+
+            if (isExpired(item)) {
+                decreaseQuality(item);
+                decreaseQuality(item);
+            }
+        }
+    },
 
     REGULAR(null) {
         @Override
@@ -70,7 +84,7 @@ public enum ItemType {
     static ItemType fromName(String name) {
         Objects.requireNonNull(name, "Item name cannot be null");
         for (ItemType type : ItemType.values()) {
-            if (name.equals(type.itemName)) {
+            if (type.itemName != null && name.startsWith(type.itemName)) {
                 return type;
             }
         }
